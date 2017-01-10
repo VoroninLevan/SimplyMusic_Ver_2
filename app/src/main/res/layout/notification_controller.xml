@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#424242">
+
+    <ImageButton
+        android:id="@+id/cancelNotification"
+        android:src="@drawable/clear_notification"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/playbackControls"
+        android:layout_marginRight="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:selectableItemBackground"/>
+
+    <RelativeLayout
+        android:id="@+id/playbackControls"
+        android:padding="5dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/skipPreviousNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@+id/playPauseNotification"
+            android:layout_toStartOf="@+id/playPauseNotification"
+            android:background="?android:selectableItemBackground"
+            android:src="@drawable/skip_previous" />
+
+        <ImageButton
+            android:id="@+id/playPauseNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@+id/skipNextNotification"
+            android:layout_toStartOf="@+id/skipNextNotification"
+            android:background="?android:selectableItemBackground"
+            android:src="@drawable/pause"/>
+
+        <ImageButton
+            android:id="@+id/skipNextNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:background="?android:selectableItemBackground"
+            android:src="@drawable/skip_next" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

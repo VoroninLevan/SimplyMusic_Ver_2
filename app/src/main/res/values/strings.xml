@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Simply Music</string>
+
+    //Page Titles
+    <string name="allSongs">All Songs</string>
+    <string name="albums">Albums</string>
+    <string name="playLists">PlayLists</string>
+    <string name="favourites">Favourite</string>
+
+    //Alert for add playlist
+    <string name="createPlaylist">Create new playlist</string>
+    <string name="hintPlaylist">Please, enter here</string>
+    <string name="positivePlaylist">Create</string>
+    <string name="negativePlaylist">Cancel</string>
+    <string name="errorName">Sorry, but playlist with given name already exists</string>
+</resources>
