@@ -66,6 +66,7 @@ public class MediaPlayerService extends Service implements
     private NotificationManager notificationManager;
     private Notification.Builder builder;
     private int NOTIFICATION_ID = 1;
+    private int FOREGROUND_NOTIFICATION = 100;
 
     private final IBinder iBinder = new MusicBinder();
 
@@ -87,6 +88,7 @@ public class MediaPlayerService extends Service implements
     public void onCreate() {
         super.onCreate();
 
+        builder = new Notification.Builder(this);
         mediaPlayer = new MediaPlayer();
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
@@ -96,11 +98,22 @@ public class MediaPlayerService extends Service implements
         mediaPlayer.setOnErrorListener(this);
         IntentFilter filter = new IntentFilter();
         filter.addAction("comvoroninlevan.httpsgithub.simplymusic.ACTION_PLAY");
+        filter.addAction("comvoroninlevan.httpsgithub.simplymusic.MAIN_ACTION_PLAY");
         filter.addAction("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_NEXT");
         filter.addAction("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_PREVIOUS");
         filter.addAction("comvoroninlevan.httpsgithub.simplymusic.ACTION_CANCEL_NOTIFICATION");
 
         registerReceiver(broadcastReceiver, filter);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        //startForeground(FOREGROUND_NOTIFICATION, builder.build());
+        if(mediaPlayer.isPlaying()) {
+            Intent setMax = new Intent("comvoroninlevan.httpsgithub.simplymusic.ON_START_COMMAND");
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(setMax);
+        }
+        return Service.START_STICKY;
     }
 
     public void setList() {
@@ -163,52 +176,9 @@ public class MediaPlayerService extends Service implements
 
     //____________________________Playback Controls_________________________________________________
 
-    public void playPauseSong() {
-
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
-        } else {
-            mediaPlayer.start();
-        }
-    }
-
     public void playIntent(Context context){
         Intent playIntent = new Intent("comvoroninlevan.httpsgithub.simplymusic.BUTTON_ACTION_PLAY");
         LocalBroadcastManager.getInstance(context).sendBroadcast(playIntent);
-    }
-
-    public void skipNext() {
-
-        if (localArrayList.size() != 0) {
-            songPosition++;
-            if (songPosition == localArrayList.size() - 1) {
-                songPosition = 0;
-            }
-            if (playlistUri == null) {
-                playSong();
-            } else {
-                playSongFromPlaylist(playlistUri);
-            }
-        } else {
-            //Toast.makeText(PlayerActivity.this, "No songs", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void skipPrevious() {
-
-        if (localArrayList.size() != 0) {
-            songPosition--;
-            if (songPosition < 0) {
-                songPosition = localArrayList.size() - 2;
-            }
-            if (playlistUri == null) {
-                playSong();
-            } else {
-                playSongFromPlaylist(playlistUri);
-            }
-        } else {
-            //Toast.makeText(PlayerActivity.this, "No songs", Toast.LENGTH_SHORT).show();
-        }
     }
 
     //______________________________________________________________________________________________
@@ -232,7 +202,6 @@ public class MediaPlayerService extends Service implements
 
     public static void setMaxDuration(Context context, int totalTime){
         Intent intent = new Intent("comvoroninlevan.httpsgithub.simplymusic.SET_MAX_DURATION");
-        //intent.putExtra("INTENT_TYPE", "MAX_DURATION");
         intent.putExtra("TOTAL_TIME", totalTime);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
@@ -267,12 +236,10 @@ public class MediaPlayerService extends Service implements
         notificationView.setOnClickPendingIntent(R.id.skipNextNotification, pendingSkipNextIntent);
         notificationView.setOnClickPendingIntent(R.id.cancelNotification, pendingCancelNotification);
 
-        builder = new Notification.Builder(this);
         builder.setContentIntent(pendingNotificationIntent)
                 .setContent(notificationView)
                 .setSmallIcon(R.drawable.play)
-                .setOngoing(true)
-                .setContentTitle("Now Playing");
+                .setOngoing(true);
 
         notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
@@ -336,6 +303,12 @@ public class MediaPlayerService extends Service implements
                 mediaPlayer.stop();
                 cancelNotification();
                 //_________________________________________________________
+            }else if(action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.MAIN_ACTION_PLAY")){
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.pause();
+                } else {
+                    mediaPlayer.start();
+                }
             }
         }
     };
@@ -347,8 +320,8 @@ public class MediaPlayerService extends Service implements
 
     @Override
     public boolean onUnbind(Intent intent) {
-        mediaPlayer.stop();
-        mediaPlayer.release();
+        //mediaPlayer.stop();
+        //mediaPlayer.release();
         return false;
     }
 

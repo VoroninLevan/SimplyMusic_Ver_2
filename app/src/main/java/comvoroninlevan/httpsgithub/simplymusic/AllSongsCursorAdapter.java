@@ -93,7 +93,7 @@ public class AllSongsCursorAdapter extends CursorAdapter {
         if(albumArt != null) {
             viewHolder.albumArt.setImageBitmap(albumArt);
         }else{
-            viewHolder.albumArt.setImageResource(R.drawable.playgold);
+            viewHolder.albumArt.setImageResource(R.drawable.placeholder);
         }
     }
 

@@ -44,7 +44,7 @@ public class AlbumsCursorAdapter extends CursorAdapter {
         if(bitmap != null) {
             albumArt.setImageBitmap(bitmap);
         }else{
-            albumArt.setImageResource(R.drawable.playgold);
+            albumArt.setImageResource(R.drawable.placeholder);
         }
 
         albumName.setLines(1);

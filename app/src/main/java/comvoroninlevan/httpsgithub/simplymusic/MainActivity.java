@@ -58,7 +58,9 @@ public class MainActivity extends AppCompatActivity {
         skipPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mediaPlayerService.skipPrevious();
+                //mediaPlayerService.skipPrevious();
+                Intent skipPreviousAction = new Intent("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_PREVIOUS");
+                sendBroadcast(skipPreviousAction);
             }
         });
         playPause = (ImageButton) findViewById(R.id.playPause);
@@ -66,11 +68,13 @@ public class MainActivity extends AppCompatActivity {
         playPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mediaPlayerService.playPauseSong();
+                //mediaPlayerService.playPauseSong();
+                Intent playPauseAction = new Intent("comvoroninlevan.httpsgithub.simplymusic.MAIN_ACTION_PLAY");
+                sendBroadcast(playPauseAction);
                 if(mediaPlayerService.mediaPlayer.isPlaying()) {
-                    playPause.setImageResource(R.drawable.pause);
-                }else{
                     playPause.setImageResource(R.drawable.play);
+                }else{
+                    playPause.setImageResource(R.drawable.pause);
                 }
             }
         });
@@ -79,7 +83,9 @@ public class MainActivity extends AppCompatActivity {
         skipNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mediaPlayerService.skipNext();
+                //mediaPlayerService.skipNext();
+                Intent skipNextAction = new Intent("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_NEXT");
+                sendBroadcast(skipNextAction);
             }
         });
 
@@ -104,18 +110,20 @@ public class MainActivity extends AppCompatActivity {
         filter = new IntentFilter();
         filter.addAction("comvoroninlevan.httpsgithub.simplymusic.BUTTON_ACTION_PLAY");
         filter.addAction("comvoroninlevan.httpsgithub.simplymusic.SET_MAX_DURATION");
+        filter.addAction("comvoroninlevan.httpsgithub.simplymusic.ON_START_COMMAND");
     }
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            //String intentType = intent.getStringExtra("INTENT_TYPE");
             String action = intent.getAction();
             if(action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.SET_MAX_DURATION")){
                 int totalTime = intent.getIntExtra("TOTAL_TIME", 0);
                 seekBar.setMax(totalTime);
             }else if(action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.BUTTON_ACTION_PLAY")){
                 playPause.setImageResource(R.drawable.pause);
+            }else if(action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ON_START_COMMAND")){
+                setMax();
             }
         }
     };
@@ -131,6 +139,12 @@ public class MainActivity extends AppCompatActivity {
             handler.postDelayed(this, 100);
         }
     };
+
+    private void setMax(){
+        totalTime = mediaPlayerService.getDuration();
+        seekBar.setMax((int)totalTime);
+        playPause.setImageResource(R.drawable.pause);
+    }
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -151,7 +165,8 @@ public class MainActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         intent = new Intent(this, MediaPlayerService.class);
-            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        startService(intent);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -171,5 +186,10 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         handler.removeCallbacks(timeUpdater);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

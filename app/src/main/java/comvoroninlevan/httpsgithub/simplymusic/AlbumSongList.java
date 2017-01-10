@@ -54,7 +54,7 @@ public class AlbumSongList extends AppCompatActivity implements LoaderManager.Lo
         if(art != null) {
             albumArt.setImageBitmap(art);
         }else{
-            albumArt.setImageResource(R.drawable.playgold);
+            albumArt.setImageResource(R.drawable.placeholder);
         }
 
         list.longList = new ArrayList<>();
