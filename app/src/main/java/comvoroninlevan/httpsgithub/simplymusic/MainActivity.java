@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
         skipPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //mediaPlayerService.skipPrevious();
                 Intent skipPreviousAction = new Intent("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_PREVIOUS");
                 sendBroadcast(skipPreviousAction);
             }
@@ -68,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
         playPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //mediaPlayerService.playPauseSong();
                 Intent playPauseAction = new Intent("comvoroninlevan.httpsgithub.simplymusic.MAIN_ACTION_PLAY");
                 sendBroadcast(playPauseAction);
                 if(mediaPlayerService.mediaPlayer.isPlaying()) {
@@ -83,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
         skipNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //mediaPlayerService.skipNext();
                 Intent skipNextAction = new Intent("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_NEXT");
                 sendBroadcast(skipNextAction);
             }
