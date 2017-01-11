@@ -1,96 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="comvoroninlevan.httpsgithub.simplymusic.MainActivity">
 
-    <HorizontalScrollView
-        android:id="@+id/scrollView"
-        android:scrollbars="none"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <android.support.design.widget.TabLayout
-            android:id="@+id/sliding_tabs"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/CategoryTab"/>
-
-    </HorizontalScrollView>
+    <android.support.design.widget.TabLayout
+        android:id="@+id/sliding_tabs"
+        style="@style/CategoryTab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:tabGravity="center"
+        app:tabMode="scrollable"/>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager"
-        android:layout_below="@id/scrollView"
-        android:layout_above="@+id/player"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_above="@+id/player"
+        android:layout_below="@id/sliding_tabs" />
 
     <RelativeLayout
         android:id="@+id/player"
-        android:layout_alignParentBottom="true"
-        android:background="@color/colorPrimary"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimary">
 
         <RelativeLayout
             android:id="@+id/playback"
-            android:layout_alignParentTop="true"
-            android:background="@color/colorPrimary"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:background="@color/colorPrimary">
 
-        <ImageView
-            android:id="@+id/imagePlayer"
-            android:layout_width="60dp"
-            android:layout_height="60dp" />
+            <ImageView
+                android:id="@+id/imagePlayer"
+                android:layout_width="60dp"
+                android:layout_height="60dp" />
 
-        <ImageButton
-            android:id="@+id/skipPrevious"
-            android:layout_toLeftOf="@+id/playPause"
-            android:layout_toStartOf="@+id/playPause"
-            android:layout_centerVertical="true"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginEnd="10dp"
-            android:background="?android:selectableItemBackground"/>
+            <ImageButton
+                android:id="@+id/skipPrevious"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_toLeftOf="@+id/playPause"
+                android:layout_toStartOf="@+id/playPause"
+                android:background="?android:selectableItemBackground" />
 
-        <ImageButton
-            android:id="@+id/playPause"
-            android:layout_toLeftOf="@+id/skipNext"
-            android:layout_toStartOf="@+id/skipNext"
-            android:layout_centerVertical="true"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginEnd="10dp"
-            android:background="?android:selectableItemBackground"/>
+            <ImageButton
+                android:id="@+id/playPause"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_toLeftOf="@+id/skipNext"
+                android:layout_toStartOf="@+id/skipNext"
+                android:background="?android:selectableItemBackground" />
 
-        <ImageButton
-            android:id="@+id/skipNext"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginEnd="10dp"
-            android:background="?android:selectableItemBackground"/>
+            <ImageButton
+                android:id="@+id/skipNext"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:background="?android:selectableItemBackground" />
 
         </RelativeLayout>
 
         <RelativeLayout
-            android:layout_below="@+id/playback"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/playback">
 
             <SeekBar
                 android:id="@+id/seekBar"
-                android:layout_centerInParent="true"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true" />
 
         </RelativeLayout>
 

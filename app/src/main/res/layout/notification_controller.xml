@@ -1,46 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#424242">
 
-    <TextView
-        android:id="@+id/titleNotification"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
+    <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:padding="2dp">
 
-    <TextView
-        android:id="@+id/artistNotification"
-        android:layout_below="@+id/titleNotification"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/albumArtNotification"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
-    <ImageButton
-        android:id="@+id/cancelNotification"
-        android:src="@drawable/clear_notification"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_above="@+id/playbackControls"
-        android:layout_marginRight="15dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginBottom="5dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="?android:selectableItemBackground"/>
+    </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/playbackControls"
-        android:padding="5dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:padding="3dp">
+
+        <TextView
+            android:id="@+id/titleNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true" />
+
+        <TextView
+            android:id="@+id/artistNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/titleNotification" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:padding="3dp"
+        android:layout_weight="2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <ImageButton
             android:id="@+id/skipPreviousNotification"
@@ -49,6 +56,7 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
+            android:layout_alignParentBottom="true"
             android:layout_toLeftOf="@+id/playPauseNotification"
             android:layout_toStartOf="@+id/playPauseNotification"
             android:background="?android:selectableItemBackground"
@@ -61,15 +69,17 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
+            android:layout_alignParentBottom="true"
             android:layout_toLeftOf="@+id/skipNextNotification"
             android:layout_toStartOf="@+id/skipNextNotification"
             android:background="?android:selectableItemBackground"
-            android:src="@drawable/pause"/>
+            android:src="@drawable/pause" />
 
         <ImageButton
             android:id="@+id/skipNextNotification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
@@ -78,6 +88,19 @@
             android:background="?android:selectableItemBackground"
             android:src="@drawable/skip_next" />
 
+        <ImageButton
+            android:id="@+id/cancelNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginRight="15dp"
+            android:background="?android:selectableItemBackground"
+            android:src="@drawable/clear_notification" />
+
     </RelativeLayout>
 
-</RelativeLayout>
+</LinearLayout>

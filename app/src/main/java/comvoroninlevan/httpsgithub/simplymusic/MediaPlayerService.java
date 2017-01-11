@@ -10,6 +10,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -65,6 +67,7 @@ public class MediaPlayerService extends Service implements
 
     private String currentTitle;
     private String currentArtist;
+    private Bitmap albumArt;
 
     private RemoteViews notificationView;
     private NotificationManager notificationManager;
@@ -147,6 +150,7 @@ public class MediaPlayerService extends Service implements
         }
         mediaPlayer.prepareAsync();
         setTitleArtist(id);
+        albumArt = getAlbumId(getApplicationContext(), id);
     }
 
     public void playSongFromPlaylist(Uri currentPlaylist) {
@@ -180,7 +184,7 @@ public class MediaPlayerService extends Service implements
     }
 
     //______________________________________________________________________________________________
-    //____________________________METHODS_TO_FIND_TITLE_ARTIST______________________________________
+    //____________________________METHODS_TO_FIND_AND SET_TITLE_ARTIST_ALBUM_ART____________________
 
     private void setTitleArtist(long id){
 
@@ -199,6 +203,40 @@ public class MediaPlayerService extends Service implements
 
     private void setTitleArtistPlaylist(long id){
 
+    }
+
+    private Bitmap getAlbumId(Context context, long id){
+
+        Bitmap albumArt = null;
+        String selection = MediaStore.Audio.Media._ID + " = " + id + "";
+        Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[] {
+                        MediaStore.Audio.Media._ID, MediaStore.Audio.Media.ALBUM_ID},
+                selection, null, null);
+        if (cursor.moveToFirst()) {
+            long albumId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+
+            albumArt = getAlbumArt(context, albumId);
+        }
+        cursor.close();
+        return albumArt;
+
+    }
+
+    private Bitmap getAlbumArt(Context context, long albumId){
+
+        Bitmap albumArt = null;
+        String selection = MediaStore.Audio.Albums._ID + " = " + albumId + "";
+        Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, null, selection, null, null);
+
+        if(cursor.moveToFirst()){
+
+            int art = cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART);
+
+            String currentArt = cursor.getString(art);
+            albumArt = BitmapFactory.decodeFile(currentArt);
+        }
+        cursor.close();
+        return albumArt;
     }
 
     //____________________________Playback Controls_________________________________________________
@@ -264,6 +302,11 @@ public class MediaPlayerService extends Service implements
         notificationView.setOnClickPendingIntent(R.id.cancelNotification, pendingCancelNotification);
         notificationView.setTextViewText(R.id.titleNotification, currentTitle);
         notificationView.setTextViewText(R.id.artistNotification, currentArtist);
+        if(albumArt!=null) {
+            notificationView.setImageViewBitmap(R.id.albumArtNotification, albumArt);
+        }else{
+            notificationView.setImageViewResource(R.id.albumArtNotification, R.drawable.placeholder);
+        }
 
         builder.setContentIntent(pendingNotificationIntent)
                 .setContent(notificationView)
