@@ -9,6 +9,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -61,6 +62,9 @@ public class MediaPlayerService extends Service implements
     private boolean isRepeat = false;
     private ArrayList<Long> localArrayList;
     private boolean check = false;
+
+    private String currentTitle;
+    private String currentArtist;
 
     private RemoteViews notificationView;
     private NotificationManager notificationManager;
@@ -142,6 +146,7 @@ public class MediaPlayerService extends Service implements
             e.printStackTrace();
         }
         mediaPlayer.prepareAsync();
+        setTitleArtist(id);
     }
 
     public void playSongFromPlaylist(Uri currentPlaylist) {
@@ -172,6 +177,28 @@ public class MediaPlayerService extends Service implements
             mediaPlayer = null;
             audioManager.abandonAudioFocus(audioFocusChangeListener);
         }
+    }
+
+    //______________________________________________________________________________________________
+    //____________________________METHODS_TO_FIND_TITLE_ARTIST______________________________________
+
+    private void setTitleArtist(long id){
+
+        String selection = MediaStore.Audio.Media._ID + " =?";
+        String currentId = String.valueOf(id);
+        String[] selectionArgs = { currentId };
+        Cursor cursor = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, selection, selectionArgs, null);
+
+        if(cursor.moveToFirst()){
+
+            currentTitle = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
+            currentArtist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+        }
+        cursor.close();
+    }
+
+    private void setTitleArtistPlaylist(long id){
+
     }
 
     //____________________________Playback Controls_________________________________________________
@@ -235,6 +262,8 @@ public class MediaPlayerService extends Service implements
         notificationView.setOnClickPendingIntent(R.id.playPauseNotification, pendingPlayIntent);
         notificationView.setOnClickPendingIntent(R.id.skipNextNotification, pendingSkipNextIntent);
         notificationView.setOnClickPendingIntent(R.id.cancelNotification, pendingCancelNotification);
+        notificationView.setTextViewText(R.id.titleNotification, currentTitle);
+        notificationView.setTextViewText(R.id.artistNotification, currentArtist);
 
         builder.setContentIntent(pendingNotificationIntent)
                 .setContent(notificationView)

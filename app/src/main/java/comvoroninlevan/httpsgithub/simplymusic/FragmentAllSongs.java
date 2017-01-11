@@ -104,6 +104,9 @@ public class FragmentAllSongs extends Fragment implements LoaderManager.LoaderCa
         return rootView;
     }
 
+    //________________________________________________PERMISSION_REQUEST_NOT_READY__________________
+
+    //          SHOULD ASK FOR REQUEST ASYNCHRONOUSLY
     public void  permissionRequest(){
         if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
@@ -123,6 +126,7 @@ public class FragmentAllSongs extends Fragment implements LoaderManager.LoaderCa
             }
         }
     }
+    //______________________________________________________________________________________________
 
     public void showCheckBoxes(){
         allSongsCursorAdapter.isCheckBoxVisible = true;
