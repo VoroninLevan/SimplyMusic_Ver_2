@@ -168,6 +168,8 @@ public class MediaPlayerService extends Service implements
             e.printStackTrace();
         }
         mediaPlayer.prepareAsync();
+        setTitleArtistPlaylist(id);
+        albumArt = null;
     }
 
     public void setSong(int songPos) {
@@ -184,7 +186,7 @@ public class MediaPlayerService extends Service implements
     }
 
     //______________________________________________________________________________________________
-    //____________________________METHODS_TO_FIND_AND SET_TITLE_ARTIST_ALBUM_ART____________________
+    //____________________________METHODS_TO_FIND_AND_SET_TITLE_ARTIST_ALBUM_ART____________________
 
     private void setTitleArtist(long id){
 
@@ -203,6 +205,17 @@ public class MediaPlayerService extends Service implements
 
     private void setTitleArtistPlaylist(long id){
 
+        Uri playlist = Uri.withAppendedPath(playlistUri, "members");
+        Uri uri = ContentUris.withAppendedId(playlist, id);
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+
+        if(cursor.moveToFirst()){
+
+            currentTitle = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Playlists.Members.TITLE));
+            currentArtist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Playlists.Members.ARTIST));
+        }
+        cursor.close();
+
     }
 
     private Bitmap getAlbumId(Context context, long id){
@@ -212,6 +225,7 @@ public class MediaPlayerService extends Service implements
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[] {
                         MediaStore.Audio.Media._ID, MediaStore.Audio.Media.ALBUM_ID},
                 selection, null, null);
+
         if (cursor.moveToFirst()) {
             long albumId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
 

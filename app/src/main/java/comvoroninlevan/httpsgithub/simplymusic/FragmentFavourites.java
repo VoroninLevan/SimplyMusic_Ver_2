@@ -249,7 +249,6 @@ public class FragmentFavourites extends Fragment implements LoaderManager.Loader
     @Override
     public void onResume() {
         super.onResume();
-        //favouritesCursorAdapter.swapCursor(null);
         String[] ids = getDataFromDb();
         if(ids.length > 0) {
             getActivity().getLoaderManager().restartLoader(FAVOURITES_LOADER, null, this);
