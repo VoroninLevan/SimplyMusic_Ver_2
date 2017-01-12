@@ -57,7 +57,6 @@ public class AlbumSongList extends AppCompatActivity implements LoaderManager.Lo
             albumArt.setImageResource(R.drawable.placeholder);
         }
 
-        list.longList = new ArrayList<>();
         albumSongsList = (ListView)findViewById(R.id.albumSongs);
         albumSongsCursorAdapter = new AlbumSongsCursorAdapter(this, null);
         albumSongsList.setAdapter(albumSongsCursorAdapter);
@@ -67,6 +66,7 @@ public class AlbumSongList extends AppCompatActivity implements LoaderManager.Lo
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
                 if(!aBoolean.bindAlbum){
+                    list.longList = new ArrayList<>();
                     aBoolean.bindAlbum = true;
                     for(int i = 0; i <= albumSongsList.getAdapter().getCount(); i++){
                         list.longList.add(i, albumSongsList.getItemIdAtPosition(i));

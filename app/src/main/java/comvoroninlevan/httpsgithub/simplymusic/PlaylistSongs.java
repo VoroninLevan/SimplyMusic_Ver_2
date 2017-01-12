@@ -56,8 +56,6 @@ public class PlaylistSongs extends AppCompatActivity implements LoaderManager.Lo
         playlistId = intent.getExtras().getLong("playlistId", 0);
         playlistSongs = (ListView)findViewById(R.id.playlistSongs);
 
-        list.longList = new ArrayList<>();
-
         playlistSongsCursorAdapter = new PlaylistSongsCursorAdapter(this, null);
         playlistSongs.setAdapter(playlistSongsCursorAdapter);
         playlistSongs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -65,6 +63,7 @@ public class PlaylistSongs extends AppCompatActivity implements LoaderManager.Lo
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
                 if(!aBoolean.bindPlaylist){
+                    list.longList = new ArrayList<>();
                     aBoolean.bindPlaylist = true;
                     for(int i = 0; i <= playlistSongs.getAdapter().getCount(); i++){
                         list.longList.add(i, playlistSongs.getItemIdAtPosition(i));

@@ -68,7 +68,6 @@ public class FragmentAllSongs extends Fragment implements LoaderManager.LoaderCa
         dbHelper = new FavouritesDbHelper(getActivity());
 
         songsList = (ListView) rootView.findViewById(R.id.listOfSongs);
-        list.longList = new ArrayList<>();
 
         allSongsCursorAdapter = new AllSongsCursorAdapter(getActivity(), null);
         songsList.setAdapter(allSongsCursorAdapter);
@@ -78,6 +77,7 @@ public class FragmentAllSongs extends Fragment implements LoaderManager.LoaderCa
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
                 if(!aBoolean.bindAllSongs){
+                    list.longList = new ArrayList<>();
                     aBoolean.bindAllSongs = true;
                     for(int i = 0; i <= songsList.getAdapter().getCount(); i++){
                         list.longList.add(i, songsList.getItemIdAtPosition(i));

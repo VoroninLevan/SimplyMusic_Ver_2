@@ -67,7 +67,6 @@ public class FragmentFavourites extends Fragment implements LoaderManager.Loader
 
 
         dbHelper = new FavouritesDbHelper(getActivity());
-        list.longList = new ArrayList<>();
 
         favouritesSongsList = (ListView) rootView.findViewById(R.id.listOfSongs);
 
@@ -79,6 +78,7 @@ public class FragmentFavourites extends Fragment implements LoaderManager.Loader
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
                 if(!aBoolean.bindFavourites){
+                    list.longList = new ArrayList<>();
                     aBoolean.bindFavourites = true;
                     for(int i = 0; i <= favouritesSongsList.getAdapter().getCount(); i++){
                         list.longList.add(i, favouritesSongsList.getItemIdAtPosition(i));

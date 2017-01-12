@@ -126,7 +126,6 @@ public class MediaPlayerService extends Service implements
     public void setList() {
 
         localArrayList = new ArrayList<>(list.longList);
-
     }
 
     public class MusicBinder extends Binder {
