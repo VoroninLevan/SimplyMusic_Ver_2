@@ -99,6 +99,7 @@ public class AddActivity extends AppCompatActivity implements LoaderManager.Load
                 values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, base + id);
                 values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, id);
                 resolver.insert(mPlaylistUri, values);
+                addToPlaylistArray.integerArray.remove(Integer.valueOf(i));
             }
         }
     }
