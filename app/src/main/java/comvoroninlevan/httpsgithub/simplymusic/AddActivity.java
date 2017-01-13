@@ -71,23 +71,7 @@ public class AddActivity extends AppCompatActivity implements LoaderManager.Load
         }
         return super.onOptionsItemSelected(item);
     }
-/*
-    private void addSongsToPlaylist(){
 
-        for(int i = 0; i != songsListView.getAdapter().getCount(); i++){
-            CheckBox checkBox = (CheckBox)songsListView.getChildAt(i).findViewById(R.id.addCheckBox);
-            ContentResolver resolver = getContentResolver();
-            int base = 0;
-            if(checkBox.isChecked()){
-                long id = addSongsCursorAdapter.getItemId(i);
-                ContentValues values = new ContentValues(2);
-                values.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, base + id);
-                values.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, id);
-                resolver.insert(mPlaylistUri, values);
-            }
-        }
-    }
-*/
     private void addSongsToPlaylist(){
 
         for(int i = 0; i != addSongsCursorAdapter.getCount(); i++){
