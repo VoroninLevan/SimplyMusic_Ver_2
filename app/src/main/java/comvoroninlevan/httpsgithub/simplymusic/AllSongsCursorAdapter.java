@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,9 +52,9 @@ public class AllSongsCursorAdapter extends CursorAdapter {
     }
 
     @Override
-    public void bindView(View view, Context context, final Cursor cursor) {
+    public void bindView(View view, final Context context, final Cursor cursor) {
 
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
+        final ViewHolder viewHolder = (ViewHolder) view.getTag();
         if (isCheckBoxVisible) {
             viewHolder.checkBox.setVisibility(View.VISIBLE);
         } else {
@@ -85,6 +86,34 @@ public class AllSongsCursorAdapter extends CursorAdapter {
 
         //__________________________ALBUM_ART_______________________________________________________
 
+
+        new AsyncTask<ViewHolder, Void, Bitmap>(){
+
+            private ViewHolder viewHolder;
+
+            @Override
+            protected Bitmap doInBackground(ViewHolder... viewHolders) {
+                viewHolder = viewHolders[0];
+                int id = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
+                long songId = cursor.getLong(id);
+
+                Bitmap albumArt = getAlbumId(context, songId);
+                return albumArt;
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                super.onPostExecute(bitmap);
+                if(bitmap != null) {
+                    viewHolder.albumArt.setImageBitmap(bitmap);
+                }else{
+                    viewHolder.albumArt.setImageResource(R.drawable.placeholder);
+                }
+            }
+        }.execute(viewHolder);
+
+
+        /*
         int id = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
         long songId = cursor.getLong(id);
 
@@ -95,6 +124,8 @@ public class AllSongsCursorAdapter extends CursorAdapter {
         }else{
             viewHolder.albumArt.setImageResource(R.drawable.placeholder);
         }
+
+        */
     }
 
     private Bitmap getAlbumId(Context context, long id){
