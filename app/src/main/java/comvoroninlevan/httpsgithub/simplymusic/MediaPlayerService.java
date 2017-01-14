@@ -142,14 +142,18 @@ public class MediaPlayerService extends Service implements
         mediaPlayer.reset();
         long id = localArrayList.get(songPosition);
         Uri uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
-        try {
-            mediaPlayer.setDataSource(getApplicationContext(), uri);
-        } catch (Exception e) {
-            e.printStackTrace();
+        int result = audioManager.requestAudioFocus(audioFocusChangeListener,
+                AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+        if(result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            try {
+                mediaPlayer.setDataSource(getApplicationContext(), uri);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            mediaPlayer.prepareAsync();
+            setTitleArtist(id);
+            albumArt = getAlbumId(getApplicationContext(), id);
         }
-        mediaPlayer.prepareAsync();
-        setTitleArtist(id);
-        albumArt = getAlbumId(getApplicationContext(), id);
     }
 
     public void playSongFromPlaylist(Uri currentPlaylist) {
@@ -178,8 +182,7 @@ public class MediaPlayerService extends Service implements
     private void releasePlayer() {
 
         if (mediaPlayer != null) {
-            mediaPlayer.release();
-            mediaPlayer = null;
+            mediaPlayer.pause();
             audioManager.abandonAudioFocus(audioFocusChangeListener);
         }
     }
@@ -348,10 +351,14 @@ public class MediaPlayerService extends Service implements
                     builder.setContent(notificationView);
                     notificationManager.notify(NOTIFICATION_ID, builder.build());
                 } else {
-                    mediaPlayer.start();
-                    notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
-                    builder.setContent(notificationView);
-                    notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    int result = audioManager.requestAudioFocus(audioFocusChangeListener,
+                            AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+                    if(result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                        mediaPlayer.start();
+                        notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
+                        builder.setContent(notificationView);
+                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    }
                 }
             }else if(action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_NEXT")){
                 if (localArrayList.size() != 0) {
@@ -413,7 +420,6 @@ public class MediaPlayerService extends Service implements
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
 
-        //releasePlayer();
         if (isShuffle) {
             Random random = new Random();
             songPosition = random.nextInt(localArrayList.size());
@@ -423,18 +429,15 @@ public class MediaPlayerService extends Service implements
             songPosition++;
         }
 
-
         if (songPosition == localArrayList.size() - 1) {
             songPosition = 0;
         }
-
 
         if (playlistUri != null) {
             playSongFromPlaylist(playlistUri);
         } else {
             playSong();
         }
-
     }
 
     @Override
