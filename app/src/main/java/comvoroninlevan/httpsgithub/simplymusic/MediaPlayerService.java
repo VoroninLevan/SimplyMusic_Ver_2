@@ -109,6 +109,7 @@ public class MediaPlayerService extends Service implements
         filter.addAction("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_NEXT");
         filter.addAction("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_PREVIOUS");
         filter.addAction("comvoroninlevan.httpsgithub.simplymusic.ACTION_CANCEL_NOTIFICATION");
+        filter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
 
         registerReceiver(broadcastReceiver, filter);
     }
@@ -235,7 +236,6 @@ public class MediaPlayerService extends Service implements
         }
         cursor.close();
         return albumArt;
-
     }
 
     private Bitmap getAlbumArt(Context context, long albumId){
@@ -411,6 +411,7 @@ public class MediaPlayerService extends Service implements
                 check = false;
                 mediaPlayer.stop();
                 cancelNotification();
+                pauseIntent(getApplicationContext());
                 //_________________________________________________________
             }else if(action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.MAIN_ACTION_PLAY")){
                 if (mediaPlayer.isPlaying()) {
@@ -428,6 +429,14 @@ public class MediaPlayerService extends Service implements
                         notificationManager.notify(NOTIFICATION_ID, builder.build());
                     }
                 }
+            }else if(action.equalsIgnoreCase(AudioManager.ACTION_AUDIO_BECOMING_NOISY)){
+                mediaPlayer.pause();
+                if(notificationView != null) {
+                    notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
+                    builder.setContent(notificationView);
+                    notificationManager.notify(NOTIFICATION_ID, builder.build());
+                }
+                pauseIntent(getApplicationContext());
             }
         }
     };
