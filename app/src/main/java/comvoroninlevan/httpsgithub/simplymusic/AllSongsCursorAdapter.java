@@ -54,7 +54,7 @@ public class AllSongsCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, final Context context, final Cursor cursor) {
 
-        final ViewHolder viewHolder = (ViewHolder) view.getTag();
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
         if (isCheckBoxVisible) {
             viewHolder.checkBox.setVisibility(View.VISIBLE);
         } else {

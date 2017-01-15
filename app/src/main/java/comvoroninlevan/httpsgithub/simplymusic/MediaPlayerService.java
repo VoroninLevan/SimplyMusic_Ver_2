@@ -262,6 +262,11 @@ public class MediaPlayerService extends Service implements
         LocalBroadcastManager.getInstance(context).sendBroadcast(playIntent);
     }
 
+    public void pauseIntent(Context context){
+        Intent playIntent = new Intent("comvoroninlevan.httpsgithub.simplymusic.ACTION_PAUSE");
+        LocalBroadcastManager.getInstance(context).sendBroadcast(playIntent);
+    }
+
     //______________________________________________________________________________________________
     //_____________________________________SEEK_BAR_HANDLING________________________________________
 
@@ -350,6 +355,7 @@ public class MediaPlayerService extends Service implements
                     notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
                     builder.setContent(notificationView);
                     notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    pauseIntent(getApplicationContext());
                 } else {
                     int result = audioManager.requestAudioFocus(audioFocusChangeListener,
                             AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
@@ -358,10 +364,16 @@ public class MediaPlayerService extends Service implements
                         notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
                         builder.setContent(notificationView);
                         notificationManager.notify(NOTIFICATION_ID, builder.build());
+                        playIntent(getApplicationContext());
                     }
                 }
             }else if(action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_NEXT")){
                 if (localArrayList.size() != 0) {
+
+                    notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
+                    builder.setContent(notificationView);
+                    notificationManager.notify(NOTIFICATION_ID, builder.build());
+
                     songPosition++;
                     if (songPosition == localArrayList.size() - 1) {
                         songPosition = 0;
@@ -376,6 +388,11 @@ public class MediaPlayerService extends Service implements
                 }
             }else if(action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_PREVIOUS")){
                 if (localArrayList.size() != 0) {
+
+                    notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
+                    builder.setContent(notificationView);
+                    notificationManager.notify(NOTIFICATION_ID, builder.build());
+
                     songPosition--;
                     if (songPosition < 0) {
                         songPosition = localArrayList.size() - 2;
@@ -398,8 +415,18 @@ public class MediaPlayerService extends Service implements
             }else if(action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.MAIN_ACTION_PLAY")){
                 if (mediaPlayer.isPlaying()) {
                     mediaPlayer.pause();
+                    if(notificationView != null){
+                        notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
+                        builder.setContent(notificationView);
+                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    }
                 } else {
                     mediaPlayer.start();
+                    if(notificationView != null){
+                        notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
+                        builder.setContent(notificationView);
+                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    }
                 }
             }
         }
