@@ -104,6 +104,7 @@ public class FragmentAllSongs extends Fragment implements LoaderManager.LoaderCa
         return rootView;
     }
 
+    // TODO USE ASYNC
     //________________________________________________PERMISSION_REQUEST_NOT_READY__________________
 
     //          SHOULD ASK FOR REQUEST ASYNCHRONOUSLY

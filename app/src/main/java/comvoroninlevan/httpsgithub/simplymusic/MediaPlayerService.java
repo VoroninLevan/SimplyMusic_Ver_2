@@ -55,11 +55,14 @@ public class MediaPlayerService extends Service implements
         return instance;
     }
 
+    private int currentApiVersion = android.os.Build.VERSION.SDK_INT;
+
     public MediaPlayer mediaPlayer;
     private int songPosition;
     private Uri playlistUri;
     private SongArrayList list = SongArrayList.getInstance();
     private AudioManager audioManager;
+    // TODO HANDLE isShuffle, isRepeat
     private boolean isShuffle = false;
     private boolean isRepeat = false;
     private ArrayList<Long> localArrayList;
@@ -117,7 +120,7 @@ public class MediaPlayerService extends Service implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         //startForeground(FOREGROUND_NOTIFICATION, builder.build());
-        if(mediaPlayer.isPlaying()) {
+        if (mediaPlayer.isPlaying()) {
             Intent setMax = new Intent("comvoroninlevan.httpsgithub.simplymusic.ON_START_COMMAND");
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(setMax);
         }
@@ -145,7 +148,7 @@ public class MediaPlayerService extends Service implements
         Uri uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
         int result = audioManager.requestAudioFocus(audioFocusChangeListener,
                 AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
-        if(result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             try {
                 mediaPlayer.setDataSource(getApplicationContext(), uri);
             } catch (Exception e) {
@@ -191,14 +194,14 @@ public class MediaPlayerService extends Service implements
     //______________________________________________________________________________________________
     //____________________________METHODS_TO_FIND_AND_SET_TITLE_ARTIST_ALBUM_ART____________________
 
-    private void setTitleArtist(long id){
+    private void setTitleArtist(long id) {
 
         String selection = MediaStore.Audio.Media._ID + " =?";
         String currentId = String.valueOf(id);
-        String[] selectionArgs = { currentId };
+        String[] selectionArgs = {currentId};
         Cursor cursor = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, selection, selectionArgs, null);
 
-        if(cursor.moveToFirst()){
+        if (cursor.moveToFirst()) {
 
             currentTitle = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
             currentArtist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
@@ -206,13 +209,13 @@ public class MediaPlayerService extends Service implements
         cursor.close();
     }
 
-    private void setTitleArtistPlaylist(long id){
+    private void setTitleArtistPlaylist(long id) {
 
         Uri playlist = Uri.withAppendedPath(playlistUri, "members");
         Uri uri = ContentUris.withAppendedId(playlist, id);
         Cursor cursor = getContentResolver().query(uri, null, null, null, null);
 
-        if(cursor.moveToFirst()){
+        if (cursor.moveToFirst()) {
 
             currentTitle = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Playlists.Members.TITLE));
             currentArtist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Playlists.Members.ARTIST));
@@ -221,11 +224,11 @@ public class MediaPlayerService extends Service implements
 
     }
 
-    private Bitmap getAlbumId(Context context, long id){
+    private Bitmap getAlbumId(Context context, long id) {
 
         Bitmap albumArt = null;
         String selection = MediaStore.Audio.Media._ID + " = " + id + "";
-        Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[] {
+        Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{
                         MediaStore.Audio.Media._ID, MediaStore.Audio.Media.ALBUM_ID},
                 selection, null, null);
 
@@ -238,13 +241,13 @@ public class MediaPlayerService extends Service implements
         return albumArt;
     }
 
-    private Bitmap getAlbumArt(Context context, long albumId){
+    private Bitmap getAlbumArt(Context context, long albumId) {
 
         Bitmap albumArt = null;
         String selection = MediaStore.Audio.Albums._ID + " = " + albumId + "";
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, null, selection, null, null);
 
-        if(cursor.moveToFirst()){
+        if (cursor.moveToFirst()) {
 
             int art = cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART);
 
@@ -257,12 +260,12 @@ public class MediaPlayerService extends Service implements
 
     //____________________________Playback Controls_________________________________________________
 
-    public void playIntent(Context context){
+    public void playIntent(Context context) {
         Intent playIntent = new Intent("comvoroninlevan.httpsgithub.simplymusic.BUTTON_ACTION_PLAY");
         LocalBroadcastManager.getInstance(context).sendBroadcast(playIntent);
     }
 
-    public void pauseIntent(Context context){
+    public void pauseIntent(Context context) {
         Intent playIntent = new Intent("comvoroninlevan.httpsgithub.simplymusic.ACTION_PAUSE");
         LocalBroadcastManager.getInstance(context).sendBroadcast(playIntent);
     }
@@ -278,22 +281,23 @@ public class MediaPlayerService extends Service implements
         return mediaPlayer.getCurrentPosition();
     }
 
-    public void seekTo(int progress){
+    public void seekTo(int progress) {
         mediaPlayer.seekTo(progress);
     }
 
-    public boolean checkPlayer(){
+    public boolean checkPlayer() {
         return check;
     }
 
-    public static void setMaxDuration(Context context, int totalTime){
+    public static void setMaxDuration(Context context, int totalTime) {
         Intent intent = new Intent("comvoroninlevan.httpsgithub.simplymusic.SET_MAX_DURATION");
         intent.putExtra("TOTAL_TIME", totalTime);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
+
     //______________________________________________________________________________________________
     //_____________________________________NOTIFICATION_____________________________________________
-    private void setNotification(){
+    private void setNotification() {
         String ns = Context.NOTIFICATION_SERVICE;
         notificationManager = (NotificationManager) getSystemService(ns);
 
@@ -323,25 +327,33 @@ public class MediaPlayerService extends Service implements
         notificationView.setOnClickPendingIntent(R.id.cancelNotification, pendingCancelNotification);
         notificationView.setTextViewText(R.id.titleNotification, currentTitle);
         notificationView.setTextViewText(R.id.artistNotification, currentArtist);
-        if(albumArt!=null) {
+        if (albumArt != null) {
             notificationView.setImageViewBitmap(R.id.albumArtNotification, albumArt);
-        }else{
+        } else {
             notificationView.setImageViewResource(R.id.albumArtNotification, R.drawable.placeholder);
         }
 
-        builder.setContentIntent(pendingNotificationIntent)
-                .setContent(notificationView)
-                .setSmallIcon(R.drawable.play)
-                .setOngoing(true);
 
+        if (currentApiVersion < 24) {
+            builder.setContentIntent(pendingNotificationIntent)
+                    .setContent(notificationView)
+                    .setSmallIcon(R.drawable.play)
+                    .setOngoing(true);
+        } else {
+            builder.setContentIntent(pendingNotificationIntent)
+                    .setCustomContentView(notificationView)
+                    .setSmallIcon(R.drawable.play)
+                    .setOngoing(true);
+        }
         notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 
-    private void cancelNotification(){
+    private void cancelNotification() {
         String ns = Context.NOTIFICATION_SERVICE;
         NotificationManager notificationManager = (NotificationManager) getSystemService(ns);
         notificationManager.cancel(NOTIFICATION_ID);
     }
+
     //______________________________________________________________________________________________
     //_______________________________________BROADCAST_RECEIVER_____________________________________
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -349,30 +361,47 @@ public class MediaPlayerService extends Service implements
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
-            if(action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_PLAY")){
+            if (action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_PLAY")) {
                 if (mediaPlayer.isPlaying()) {
                     mediaPlayer.pause();
-                    notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
-                    builder.setContent(notificationView);
-                    notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    if (currentApiVersion < 24) {
+                        notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
+                        builder.setContent(notificationView);
+                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    } else {
+                        notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
+                        builder.setCustomContentView(notificationView);
+                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    }
                     pauseIntent(getApplicationContext());
                 } else {
                     int result = audioManager.requestAudioFocus(audioFocusChangeListener,
                             AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
-                    if(result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                    if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                         mediaPlayer.start();
-                        notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
-                        builder.setContent(notificationView);
-                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                        if (currentApiVersion < 24) {
+                            notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
+                            builder.setContent(notificationView);
+                            notificationManager.notify(NOTIFICATION_ID, builder.build());
+                        } else {
+                            notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
+                            builder.setCustomContentView(notificationView);
+                            notificationManager.notify(NOTIFICATION_ID, builder.build());
+                        }
                         playIntent(getApplicationContext());
                     }
                 }
-            }else if(action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_NEXT")){
+            } else if (action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_NEXT")) {
                 if (localArrayList.size() != 0) {
-
-                    notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
-                    builder.setContent(notificationView);
-                    notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    if (currentApiVersion < 24) {
+                        notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
+                        builder.setContent(notificationView);
+                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    } else {
+                        notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
+                        builder.setCustomContentView(notificationView);
+                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    }
 
                     songPosition++;
                     if (songPosition == localArrayList.size() - 1) {
@@ -384,14 +413,20 @@ public class MediaPlayerService extends Service implements
                         playSongFromPlaylist(playlistUri);
                     }
                 } else {
+                    // TODO HANDLE ELSE
                     //Toast.makeText(PlayerActivity.this, "No songs", Toast.LENGTH_SHORT).show();
                 }
-            }else if(action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_PREVIOUS")){
+            } else if (action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_PREVIOUS")) {
                 if (localArrayList.size() != 0) {
-
-                    notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
-                    builder.setContent(notificationView);
-                    notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    if (currentApiVersion < 24) {
+                        notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
+                        builder.setContent(notificationView);
+                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    } else {
+                        notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
+                        builder.setCustomContentView(notificationView);
+                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    }
 
                     songPosition--;
                     if (songPosition < 0) {
@@ -403,43 +438,62 @@ public class MediaPlayerService extends Service implements
                         playSongFromPlaylist(playlistUri);
                     }
                 } else {
+                    // TODO HANDLE ELSE
                     //Toast.makeText(PlayerActivity.this, "No songs", Toast.LENGTH_SHORT).show();
                 }
-            }else if(action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_CANCEL_NOTIFICATION")){
+            } else if (action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_CANCEL_NOTIFICATION")) {
 
-                // NOT READY YET___________________________________________
                 check = false;
                 mediaPlayer.stop();
                 cancelNotification();
                 pauseIntent(getApplicationContext());
-                //_________________________________________________________
-            }else if(action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.MAIN_ACTION_PLAY")){
+
+            } else if (action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.MAIN_ACTION_PLAY")) {
                 if (mediaPlayer.isPlaying()) {
                     mediaPlayer.pause();
-                    if(notificationView != null){
-                        notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
-                        builder.setContent(notificationView);
-                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    if (notificationView != null) {
+                        if (currentApiVersion < 24) {
+                            notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
+                            builder.setContent(notificationView);
+                            notificationManager.notify(NOTIFICATION_ID, builder.build());
+                        } else {
+                            notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
+                            builder.setCustomContentView(notificationView);
+                            notificationManager.notify(NOTIFICATION_ID, builder.build());
+                        }
+                    } else {
+                        mediaPlayer.start();
+                        if (notificationView != null) {
+                            if (currentApiVersion < 24) {
+                                notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
+                                builder.setContent(notificationView);
+                                notificationManager.notify(NOTIFICATION_ID, builder.build());
+                            } else {
+                                notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
+                                builder.setCustomContentView(notificationView);
+                                notificationManager.notify(NOTIFICATION_ID, builder.build());
+                            }
+                        }
                     }
-                } else {
-                    mediaPlayer.start();
-                    if(notificationView != null){
-                        notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
-                        builder.setContent(notificationView);
-                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                } else if (action.equalsIgnoreCase(AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
+                    mediaPlayer.pause();
+                    if (notificationView != null) {
+                        if (currentApiVersion < 24) {
+                            notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
+                            builder.setContent(notificationView);
+                            notificationManager.notify(NOTIFICATION_ID, builder.build());
+                        } else {
+                            notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
+                            builder.setCustomContentView(notificationView);
+                            notificationManager.notify(NOTIFICATION_ID, builder.build());
+                        }
                     }
+                    pauseIntent(getApplicationContext());
                 }
-            }else if(action.equalsIgnoreCase(AudioManager.ACTION_AUDIO_BECOMING_NOISY)){
-                mediaPlayer.pause();
-                if(notificationView != null) {
-                    notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
-                    builder.setContent(notificationView);
-                    notificationManager.notify(NOTIFICATION_ID, builder.build());
-                }
-                pauseIntent(getApplicationContext());
             }
         }
     };
+
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -484,8 +538,8 @@ public class MediaPlayerService extends Service implements
     @Override
     public void onPrepared(MediaPlayer mediaPlayer) {
         mediaPlayer.start();
-        int totalTime = ((int)getDuration());
-        setMaxDuration(getApplicationContext(),totalTime);
+        int totalTime = ((int) getDuration());
+        setMaxDuration(getApplicationContext(), totalTime);
         playIntent(getApplicationContext());
         setNotification();
     }
