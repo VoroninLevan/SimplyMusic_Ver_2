@@ -2,9 +2,6 @@ package comvoroninlevan.httpsgithub.simplymusic;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +11,8 @@ import android.widget.CompoundButton;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.squareup.picasso.Picasso;
+import java.io.File;
 
 /**
  * Created by Levan on 06.12.2016.
@@ -54,7 +53,7 @@ public class AllSongsCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, final Context context, final Cursor cursor) {
 
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
+        final ViewHolder viewHolder = (ViewHolder) view.getTag();
         if (isCheckBoxVisible) {
             viewHolder.checkBox.setVisibility(View.VISIBLE);
         } else {
@@ -86,79 +85,45 @@ public class AllSongsCursorAdapter extends CursorAdapter {
 
         //__________________________ALBUM_ART_______________________________________________________
 
-
-        new AsyncTask<ViewHolder, Void, Bitmap>(){
-
-            private ViewHolder viewHolder;
-
-            @Override
-            protected Bitmap doInBackground(ViewHolder... viewHolders) {
-                viewHolder = viewHolders[0];
-                int id = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
-                long songId = cursor.getLong(id);
-
-                Bitmap albumArt = getAlbumId(context, songId);
-                return albumArt;
-            }
-
-            @Override
-            protected void onPostExecute(Bitmap bitmap) {
-                super.onPostExecute(bitmap);
-                if(bitmap != null) {
-                    viewHolder.albumArt.setImageBitmap(bitmap);
-                }else{
-                    viewHolder.albumArt.setImageResource(R.drawable.placeholder);
-                }
-            }
-        }.execute(viewHolder);
-
-
-        /*
         int id = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
         long songId = cursor.getLong(id);
-
-        Bitmap albumArt = getAlbumId(context, songId);
-
-        if(albumArt != null) {
-            viewHolder.albumArt.setImageBitmap(albumArt);
+        String string = getAlbumArtPath(context, songId);
+        if(string!=null) {
+            Picasso.with(context)
+                    .load(new File(string))
+                    .into(viewHolder.albumArt);
         }else{
             viewHolder.albumArt.setImageResource(R.drawable.placeholder);
         }
-
-        */
     }
+    private String getAlbumArtPath(Context context, long id) {
 
-    private Bitmap getAlbumId(Context context, long id){
-
-        Bitmap albumArt = null;
         String selection = MediaStore.Audio.Media._ID + " = " + id + "";
-        Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[] {
+        Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{
                         MediaStore.Audio.Media._ID, MediaStore.Audio.Media.ALBUM_ID},
                 selection, null, null);
         if (cursor.moveToFirst()) {
             long albumId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
 
-            albumArt = getAlbumArt(context, albumId);
+            return getAlbumArt(context, albumId);
         }
         cursor.close();
-        return albumArt;
+        return null;
 
     }
 
-    private Bitmap getAlbumArt(Context context, long albumId){
+    private String getAlbumArt(Context context, long albumId) {
 
-        Bitmap albumArt = null;
         String selection = MediaStore.Audio.Albums._ID + " = " + albumId + "";
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, null, selection, null, null);
 
-        if(cursor.moveToFirst()){
+        if (cursor.moveToFirst()) {
 
             int art = cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART);
 
-            String currentArt = cursor.getString(art);
-            albumArt = BitmapFactory.decodeFile(currentArt);
+            return cursor.getString(art);
         }
         cursor.close();
-        return albumArt;
+        return null;
     }
 }
