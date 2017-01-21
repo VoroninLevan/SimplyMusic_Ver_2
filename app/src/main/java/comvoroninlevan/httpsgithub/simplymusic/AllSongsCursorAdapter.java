@@ -87,10 +87,10 @@ public class AllSongsCursorAdapter extends CursorAdapter {
 
         int id = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
         long songId = cursor.getLong(id);
-        String string = getAlbumArtPath(context, songId);
-        if(string!=null) {
+        String pathToAlbumArt = getAlbumArtPath(context, songId);
+        if(pathToAlbumArt!=null) {
             Picasso.with(context)
-                    .load(new File(string))
+                    .load(new File(pathToAlbumArt))
                     .into(viewHolder.albumArt);
         }else{
             viewHolder.albumArt.setImageResource(R.drawable.placeholder);

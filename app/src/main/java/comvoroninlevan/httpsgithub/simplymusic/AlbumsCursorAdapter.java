@@ -12,6 +12,10 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
+
 /**
  * Created by Levan on 06.12.2016.
  */
@@ -22,32 +26,46 @@ public class AlbumsCursorAdapter extends CursorAdapter {
         super(context, cursor, 0);
     }
 
+    private static class ViewHolder {
+        TextView title;
+        ImageView albumArt;
+
+        private ViewHolder(View view) {
+
+            title = (TextView) view.findViewById(R.id.albumName);
+            albumArt = (ImageView) view.findViewById(R.id.albumArt);
+        }
+    }
+
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-        return LayoutInflater.from(context).inflate(R.layout.album_item, viewGroup, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.album_item, viewGroup, false);
+        ViewHolder viewHolder = new ViewHolder(view);
+        view.setTag(viewHolder);
+        return view;
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
 
-        ImageView albumArt = (ImageView)view.findViewById(R.id.albumArt);
-        TextView albumName = (TextView)view.findViewById(R.id.albumName);
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         int currentArt = cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART);
         int albumTitle = cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM);
 
-        String art = cursor.getString(currentArt);
-        Bitmap bitmap = BitmapFactory.decodeFile(art);
+        String pathToAlbumArt = cursor.getString(currentArt);
 
         String title = cursor.getString(albumTitle);
 
-        if(bitmap != null) {
-            albumArt.setImageBitmap(bitmap);
+        if(pathToAlbumArt != null) {
+            Picasso.with(context)
+                    .load(new File(pathToAlbumArt))
+                    .into(viewHolder.albumArt);
         }else{
-            albumArt.setImageResource(R.drawable.placeholder);
+            viewHolder.albumArt.setImageResource(R.drawable.placeholder);
         }
 
-        albumName.setLines(1);
-        albumName.setText(title);
+        viewHolder.title.setLines(1);
+        viewHolder.title.setText(title);
     }
 }
