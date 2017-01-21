@@ -16,20 +16,14 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.support.v4.content.LocalBroadcastManager;
-import android.view.View;
-import android.widget.ImageButton;
 import android.widget.RemoteViews;
-import android.widget.SeekBar;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Levan on 13.12.2016.
@@ -89,7 +83,7 @@ public class MediaPlayerService extends Service implements
             } else if (changeFocus == AudioManager.AUDIOFOCUS_GAIN) {
                 mediaPlayer.start();
             } else if (changeFocus == AudioManager.AUDIOFOCUS_LOSS) {
-                releasePlayer();
+                pausePlayer();
             }
         }
     };
@@ -183,10 +177,12 @@ public class MediaPlayerService extends Service implements
         songPosition = songPos;
     }
 
-    private void releasePlayer() {
+    private void pausePlayer() {
 
         if (mediaPlayer != null) {
             mediaPlayer.pause();
+            pauseIntent(getApplicationContext());
+            pauseForNotification();
             audioManager.abandonAudioFocus(audioFocusChangeListener);
         }
     }
@@ -266,9 +262,22 @@ public class MediaPlayerService extends Service implements
     }
 
     public void pauseIntent(Context context) {
-        Intent playIntent = new Intent("comvoroninlevan.httpsgithub.simplymusic.ACTION_PAUSE");
-        LocalBroadcastManager.getInstance(context).sendBroadcast(playIntent);
+        Intent pauseIntent = new Intent("comvoroninlevan.httpsgithub.simplymusic.ACTION_PAUSE");
+        LocalBroadcastManager.getInstance(context).sendBroadcast(pauseIntent);
     }
+
+    public void pauseForNotification(){
+        if (notificationView != null) {
+            if (currentApiVersion < 24) {
+                notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
+                builder.setContent(notificationView);
+                notificationManager.notify(NOTIFICATION_ID, builder.build());
+            } else {
+                notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
+                builder.setCustomContentView(notificationView);
+                notificationManager.notify(NOTIFICATION_ID, builder.build());
+            }
+        }    }
 
     //______________________________________________________________________________________________
     //_____________________________________SEEK_BAR_HANDLING________________________________________
@@ -392,6 +401,7 @@ public class MediaPlayerService extends Service implements
                     }
                 }
             } else if (action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_NEXT")) {
+                // TODO HANDLE IF STATEMENT
                 if (localArrayList.size() != 0) {
                     if (currentApiVersion < 24) {
                         notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
@@ -417,6 +427,7 @@ public class MediaPlayerService extends Service implements
                     //Toast.makeText(PlayerActivity.this, "No songs", Toast.LENGTH_SHORT).show();
                 }
             } else if (action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_PREVIOUS")) {
+                // TODO HANDLE IF STATEMENT
                 if (localArrayList.size() != 0) {
                     if (currentApiVersion < 24) {
                         notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
@@ -461,7 +472,11 @@ public class MediaPlayerService extends Service implements
                             builder.setCustomContentView(notificationView);
                             notificationManager.notify(NOTIFICATION_ID, builder.build());
                         }
-                    } else {
+                    }
+                } else {
+                    int result = audioManager.requestAudioFocus(audioFocusChangeListener,
+                            AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+                    if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                         mediaPlayer.start();
                         if (notificationView != null) {
                             if (currentApiVersion < 24) {
@@ -475,24 +490,25 @@ public class MediaPlayerService extends Service implements
                             }
                         }
                     }
-                } else if (action.equalsIgnoreCase(AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
-                    mediaPlayer.pause();
-                    if (notificationView != null) {
-                        if (currentApiVersion < 24) {
-                            notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
-                            builder.setContent(notificationView);
-                            notificationManager.notify(NOTIFICATION_ID, builder.build());
-                        } else {
-                            notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
-                            builder.setCustomContentView(notificationView);
-                            notificationManager.notify(NOTIFICATION_ID, builder.build());
-                        }
-                    }
-                    pauseIntent(getApplicationContext());
                 }
+            } else if (action.equalsIgnoreCase(AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
+                mediaPlayer.pause();
+                if (notificationView != null) {
+                    if (currentApiVersion < 24) {
+                        notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
+                        builder.setContent(notificationView);
+                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    } else {
+                        notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
+                        builder.setCustomContentView(notificationView);
+                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                    }
+                }
+                pauseIntent(getApplicationContext());
             }
         }
     };
+
 
 
     @Override
