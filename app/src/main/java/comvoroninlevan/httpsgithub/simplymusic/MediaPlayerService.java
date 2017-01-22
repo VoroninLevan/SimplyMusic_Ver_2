@@ -21,6 +21,7 @@ import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -59,7 +60,7 @@ public class MediaPlayerService extends Service implements
     // TODO HANDLE isShuffle, isRepeat
     private boolean isShuffle = false;
     private boolean isRepeat = false;
-    private ArrayList<Long> localArrayList;
+    public ArrayList<Long> localArrayList;
     private boolean check = false;
 
     private String currentTitle;
@@ -277,7 +278,8 @@ public class MediaPlayerService extends Service implements
                 builder.setCustomContentView(notificationView);
                 notificationManager.notify(NOTIFICATION_ID, builder.build());
             }
-        }    }
+        }
+    }
 
     //______________________________________________________________________________________________
     //_____________________________________SEEK_BAR_HANDLING________________________________________
@@ -402,7 +404,7 @@ public class MediaPlayerService extends Service implements
                 }
             } else if (action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_NEXT")) {
                 // TODO HANDLE IF STATEMENT
-                if (localArrayList.size() != 0) {
+                if (localArrayList != null) {
                     if (currentApiVersion < 24) {
                         notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
                         builder.setContent(notificationView);
@@ -424,11 +426,11 @@ public class MediaPlayerService extends Service implements
                     }
                 } else {
                     // TODO HANDLE ELSE
-                    //Toast.makeText(PlayerActivity.this, "No songs", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Please, choose song", Toast.LENGTH_SHORT).show();
                 }
             } else if (action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_PREVIOUS")) {
                 // TODO HANDLE IF STATEMENT
-                if (localArrayList.size() != 0) {
+                if (localArrayList != null) {
                     if (currentApiVersion < 24) {
                         notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
                         builder.setContent(notificationView);
@@ -450,7 +452,7 @@ public class MediaPlayerService extends Service implements
                     }
                 } else {
                     // TODO HANDLE ELSE
-                    //Toast.makeText(PlayerActivity.this, "No songs", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Please, choose song", Toast.LENGTH_SHORT).show();
                 }
             } else if (action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_CANCEL_NOTIFICATION")) {
 

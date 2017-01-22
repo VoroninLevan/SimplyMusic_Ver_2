@@ -68,12 +68,16 @@ public class MainActivity extends AppCompatActivity {
         playPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent playPauseAction = new Intent("comvoroninlevan.httpsgithub.simplymusic.MAIN_ACTION_PLAY");
-                sendBroadcast(playPauseAction);
-                if (mediaPlayerService.mediaPlayer.isPlaying()) {
-                    playPause.setImageResource(R.drawable.play);
-                } else {
-                    playPause.setImageResource(R.drawable.pause);
+                if(mediaPlayerService.localArrayList != null) {
+                    if (mediaPlayerService.mediaPlayer.isPlaying()) {
+                        Intent playPauseAction = new Intent("comvoroninlevan.httpsgithub.simplymusic.MAIN_ACTION_PLAY");
+                        sendBroadcast(playPauseAction);
+                        playPause.setImageResource(R.drawable.play);
+                    } else {
+                        Intent playPauseAction = new Intent("comvoroninlevan.httpsgithub.simplymusic.MAIN_ACTION_PLAY");
+                        sendBroadcast(playPauseAction);
+                        playPause.setImageResource(R.drawable.pause);
+                    }
                 }
             }
         });
