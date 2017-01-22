@@ -100,9 +100,11 @@ public class FragmentFavourites extends Fragment implements LoaderManager.Loader
             }
         });
 
-        String[] ids = getDataFromDb();
-        if(ids.length > 0) {
-            getActivity().getLoaderManager().initLoader(FAVOURITES_LOADER, null, this);
+        if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            String[] ids = getDataFromDb();
+            if (ids.length > 0) {
+                getActivity().getLoaderManager().initLoader(FAVOURITES_LOADER, null, this);
+            }
         }
 
         return rootView;
@@ -249,9 +251,11 @@ public class FragmentFavourites extends Fragment implements LoaderManager.Loader
     @Override
     public void onResume() {
         super.onResume();
-        String[] ids = getDataFromDb();
-        if(ids.length > 0) {
-            getActivity().getLoaderManager().restartLoader(FAVOURITES_LOADER, null, this);
+        if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            String[] ids = getDataFromDb();
+            if (ids.length > 0) {
+                getActivity().getLoaderManager().restartLoader(FAVOURITES_LOADER, null, this);
+            }
         }
         favouritesCursorAdapter.notifyDataSetChanged();
     }

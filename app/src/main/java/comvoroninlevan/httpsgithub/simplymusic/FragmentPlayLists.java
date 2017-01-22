@@ -1,20 +1,26 @@
 package comvoroninlevan.httpsgithub.simplymusic;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.LoaderManager;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.text.InputType;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -101,10 +107,26 @@ public class FragmentPlayLists extends Fragment implements LoaderManager.LoaderC
                 showCreateConfirmationDialog();
             }
         });
+        if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            getActivity().getLoaderManager().initLoader(LOADER, null, this);
+        }
 
-        getActivity().getLoaderManager().initLoader(LOADER, null, this);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("comvoroninlevan.httpsgithub.simplymusic.PERMISSION_GRANTED");
+
+        getActivity().registerReceiver(broadcastReceiver, filter);
         return rootView;
     }
+
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.PERMISSION_GRANTED")){
+                getActivity().getLoaderManager().initLoader(LOADER, null, FragmentPlayLists.this);
+            }
+        }
+    };
 
     private void showCreateConfirmationDialog() {
 

@@ -1,13 +1,19 @@
 package comvoroninlevan.httpsgithub.simplymusic;
 
+import android.Manifest;
 import android.app.LoaderManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,9 +52,26 @@ public class FragmentAlbums extends Fragment implements LoaderManager.LoaderCall
             }
         });
 
-        getActivity().getLoaderManager().initLoader(ALBUM_LOADER, null, this);
+        if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            getActivity().getLoaderManager().initLoader(ALBUM_LOADER, null, this);
+        }
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("comvoroninlevan.httpsgithub.simplymusic.PERMISSION_GRANTED");
+
+        getActivity().registerReceiver(broadcastReceiver, filter);
         return rootView;
     }
+
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.PERMISSION_GRANTED")){
+                getActivity().getLoaderManager().initLoader(ALBUM_LOADER, null, FragmentAlbums.this);
+            }
+        }
+    };
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {

@@ -2,22 +2,24 @@ package comvoroninlevan.httpsgithub.simplymusic;
 
 import android.Manifest;
 import android.app.LoaderManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Loader;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -64,7 +66,6 @@ public class FragmentAllSongs extends Fragment implements LoaderManager.LoaderCa
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.list_view, container, false);
 
-        permissionRequest();
         dbHelper = new FavouritesDbHelper(getActivity());
 
         songsList = (ListView) rootView.findViewById(R.id.listOfSongs);
@@ -99,35 +100,43 @@ public class FragmentAllSongs extends Fragment implements LoaderManager.LoaderCa
             }
         });
 
-        getActivity().getLoaderManager().initLoader(SONG_LOADER, null, this);
+        if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            getActivity().getLoaderManager().initLoader(SONG_LOADER, null, this);
+        }else{
+            new AsyncTask<Void, Void, Void>(){
+
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    permissionRequest();
+                    return null;
+                }
+            }.execute();
+        }
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("comvoroninlevan.httpsgithub.simplymusic.PERMISSION_GRANTED");
+
+        getActivity().registerReceiver(broadcastReceiver, filter);
 
         return rootView;
     }
 
-    // TODO USE ASYNC
-    //________________________________________________PERMISSION_REQUEST_NOT_READY__________________
-
-    //          SHOULD ASK FOR REQUEST ASYNCHRONOUSLY
-    public void  permissionRequest(){
-        if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-        }else{
-
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == 1){
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
-
-            }else{
-                permissionRequest();
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.PERMISSION_GRANTED")){
+                getActivity().getLoaderManager().initLoader(SONG_LOADER, null, FragmentAllSongs.this);
             }
         }
+    };
+
+    public void  permissionRequest(){
+        if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        }
     }
-    //______________________________________________________________________________________________
 
     public void showCheckBoxes(){
         allSongsCursorAdapter.isCheckBoxVisible = true;
@@ -246,12 +255,10 @@ public class FragmentAllSongs extends Fragment implements LoaderManager.LoaderCa
         super.onPause();
 
         for(int i = 0; i != allSongsCursorAdapter.getCount(); i++){
-
             if(favouritesArray.integerArray.contains(i)){
                 favouritesArray.integerArray.remove(Integer.valueOf(i));
             }
         }
-
         aBoolean.bindAllSongs = false;
     }
 }
