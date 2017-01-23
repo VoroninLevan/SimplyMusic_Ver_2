@@ -23,6 +23,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -66,6 +67,7 @@ public class MediaPlayerService extends Service implements
     private String currentTitle;
     private String currentArtist;
     private Bitmap albumArt;
+    private String currentArt;
 
     private RemoteViews notificationView;
     private NotificationManager notificationManager;
@@ -152,6 +154,7 @@ public class MediaPlayerService extends Service implements
             mediaPlayer.prepareAsync();
             setTitleArtist(id);
             albumArt = getAlbumId(getApplicationContext(), id);
+            setTitleArtistAlbumArtMainActivity(getApplicationContext());
         }
     }
 
@@ -186,6 +189,20 @@ public class MediaPlayerService extends Service implements
             pauseForNotification();
             audioManager.abandonAudioFocus(audioFocusChangeListener);
         }
+    }
+
+    //______________________________________________________________________________________________
+    //_________________BROADCAST_INTENT_TO_SET_ARTIST_TITLE_ALBUM_ART_IN_MAIN_ACTIVITY______________
+
+    private void setTitleArtistAlbumArtMainActivity(Context context){
+
+        Intent sendDataToMainActivity = new Intent("comvoroninlevan.httpsgithub.simplymusic.SONG_INFO");
+        sendDataToMainActivity.putExtra("Title", currentTitle);
+        sendDataToMainActivity.putExtra("Artist", currentArtist);
+        // TODO decode bitmap to byte[], putExtra byte[]
+        sendDataToMainActivity.putExtra("AlbumArt", currentArt);
+
+        LocalBroadcastManager.getInstance(context).sendBroadcast(sendDataToMainActivity);
     }
 
     //______________________________________________________________________________________________
@@ -248,7 +265,7 @@ public class MediaPlayerService extends Service implements
 
             int art = cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART);
 
-            String currentArt = cursor.getString(art);
+            currentArt = cursor.getString(art);
             albumArt = BitmapFactory.decodeFile(currentArt);
         }
         cursor.close();
@@ -403,7 +420,6 @@ public class MediaPlayerService extends Service implements
                     }
                 }
             } else if (action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_NEXT")) {
-                // TODO HANDLE IF STATEMENT
                 if (localArrayList != null) {
                     if (currentApiVersion < 24) {
                         notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
@@ -429,7 +445,6 @@ public class MediaPlayerService extends Service implements
                     Toast.makeText(getApplicationContext(), "Please, choose song", Toast.LENGTH_SHORT).show();
                 }
             } else if (action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_PREVIOUS")) {
-                // TODO HANDLE IF STATEMENT
                 if (localArrayList != null) {
                     if (currentApiVersion < 24) {
                         notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);

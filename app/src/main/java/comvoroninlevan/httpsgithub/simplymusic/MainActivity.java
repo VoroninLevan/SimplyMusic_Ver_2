@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
@@ -21,7 +23,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.support.design.widget.TabLayout;
+import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,9 +36,12 @@ public class MainActivity extends AppCompatActivity {
     private double totalTime;
     private boolean isPlay = false;
 
-    SeekBar seekBar;
-    ImageButton playPause;
-    IntentFilter filter;
+    private SeekBar seekBar;
+    private ImageButton playPause;
+    private ImageView imagePlayer;
+    private TextView title;
+    private TextView artist;
+    private IntentFilter filter;
     private Handler handler = new Handler();
 
     private MediaPlayerService mediaPlayerService = MediaPlayerService.getInstance();
@@ -53,6 +60,10 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+        imagePlayer = (ImageView)findViewById(R.id.imagePlayer);
+        title = (TextView)findViewById(R.id.title);
+        artist = (TextView)findViewById(R.id.artist);
 
         ImageButton skipPrevious = (ImageButton) findViewById(R.id.skipPrevious);
         skipPrevious.setImageResource(R.drawable.skip_previous);
@@ -114,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction("comvoroninlevan.httpsgithub.simplymusic.ACTION_PAUSE");
         filter.addAction("comvoroninlevan.httpsgithub.simplymusic.SET_MAX_DURATION");
         filter.addAction("comvoroninlevan.httpsgithub.simplymusic.ON_START_COMMAND");
+        filter.addAction("comvoroninlevan.httpsgithub.simplymusic.SONG_INFO");
     }
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -132,6 +144,18 @@ public class MainActivity extends AppCompatActivity {
             } else if (action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_PAUSE")) {
                 if (playPause != null) {
                     playPause.setImageResource(R.drawable.play);
+                }
+            } else if (action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.SONG_INFO")){
+                String songTitle = intent.getStringExtra("Title");
+                String songArtist = intent.getStringExtra("Artist");
+                String songArt = intent.getStringExtra("AlbumArt");
+                title.setText(songTitle);
+                artist.setText(songArtist);
+                Bitmap art = BitmapFactory.decodeFile(songArt);
+                if(art != null){
+                    imagePlayer.setImageBitmap(art);
+                } else {
+                    imagePlayer.setImageResource(R.drawable.placeholder);
                 }
             }
         }
