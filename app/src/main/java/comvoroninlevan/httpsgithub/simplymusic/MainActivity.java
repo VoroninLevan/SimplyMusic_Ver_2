@@ -207,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter);
         if (mediaPlayerService.checkPlayer()) {
+            mediaPlayerService.setTitleArtistAlbumArtMainActivity(getApplicationContext());
             totalTime = mediaPlayerService.getDuration();
             seekBar.setMax((int) totalTime);
             playPause.setImageResource(R.drawable.pause);

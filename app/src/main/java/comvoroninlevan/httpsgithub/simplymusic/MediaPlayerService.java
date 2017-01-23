@@ -175,6 +175,7 @@ public class MediaPlayerService extends Service implements
         mediaPlayer.prepareAsync();
         setTitleArtistPlaylist(id);
         albumArt = null;
+        setTitleArtistAlbumArtMainActivity(getApplicationContext());
     }
 
     public void setSong(int songPos) {
@@ -194,13 +195,17 @@ public class MediaPlayerService extends Service implements
     //______________________________________________________________________________________________
     //_________________BROADCAST_INTENT_TO_SET_ARTIST_TITLE_ALBUM_ART_IN_MAIN_ACTIVITY______________
 
-    private void setTitleArtistAlbumArtMainActivity(Context context){
+    public void setTitleArtistAlbumArtMainActivity(Context context){
 
         Intent sendDataToMainActivity = new Intent("comvoroninlevan.httpsgithub.simplymusic.SONG_INFO");
         sendDataToMainActivity.putExtra("Title", currentTitle);
         sendDataToMainActivity.putExtra("Artist", currentArtist);
-        // TODO decode bitmap to byte[], putExtra byte[]
-        sendDataToMainActivity.putExtra("AlbumArt", currentArt);
+        if(playlistUri == null) {
+            sendDataToMainActivity.putExtra("AlbumArt", currentArt);
+        } else {
+            currentArt = null;
+            sendDataToMainActivity.putExtra("AlbumArt", currentArt);
+        }
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(sendDataToMainActivity);
     }
