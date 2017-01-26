@@ -294,11 +294,13 @@ public class MediaPlayerService extends Service implements
             if (currentApiVersion < 24) {
                 notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
                 builder.setContent(notificationView);
-                notificationManager.notify(NOTIFICATION_ID, builder.build());
+                //notificationManager.notify(NOTIFICATION_ID, builder.build());
+                startForeground(FOREGROUND_NOTIFICATION, builder.build());
             } else {
                 notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
                 builder.setCustomContentView(notificationView);
-                notificationManager.notify(NOTIFICATION_ID, builder.build());
+                //notificationManager.notify(NOTIFICATION_ID, builder.build());
+                startForeground(FOREGROUND_NOTIFICATION, builder.build());
             }
         }
     }
@@ -331,8 +333,6 @@ public class MediaPlayerService extends Service implements
     //______________________________________________________________________________________________
     //_____________________________________NOTIFICATION_____________________________________________
     private void setNotification() {
-        String ns = Context.NOTIFICATION_SERVICE;
-        notificationManager = (NotificationManager) getSystemService(ns);
 
         notificationView = new RemoteViews(getPackageName(), R.layout.notification_controller);
 
@@ -378,13 +378,11 @@ public class MediaPlayerService extends Service implements
                     .setSmallIcon(R.drawable.play)
                     .setOngoing(true);
         }
-        notificationManager.notify(NOTIFICATION_ID, builder.build());
+        startForeground(FOREGROUND_NOTIFICATION, builder.build());
     }
 
     private void cancelNotification() {
-        String ns = Context.NOTIFICATION_SERVICE;
-        NotificationManager notificationManager = (NotificationManager) getSystemService(ns);
-        notificationManager.cancel(NOTIFICATION_ID);
+        stopForeground(true);
     }
 
     //______________________________________________________________________________________________
@@ -400,11 +398,11 @@ public class MediaPlayerService extends Service implements
                     if (currentApiVersion < 24) {
                         notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
                         builder.setContent(notificationView);
-                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                        startForeground(FOREGROUND_NOTIFICATION, builder.build());
                     } else {
                         notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
                         builder.setCustomContentView(notificationView);
-                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                        startForeground(FOREGROUND_NOTIFICATION, builder.build());
                     }
                     pauseIntent(getApplicationContext());
                 } else {
@@ -415,11 +413,11 @@ public class MediaPlayerService extends Service implements
                         if (currentApiVersion < 24) {
                             notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
                             builder.setContent(notificationView);
-                            notificationManager.notify(NOTIFICATION_ID, builder.build());
+                            startForeground(FOREGROUND_NOTIFICATION, builder.build());
                         } else {
                             notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
                             builder.setCustomContentView(notificationView);
-                            notificationManager.notify(NOTIFICATION_ID, builder.build());
+                            startForeground(FOREGROUND_NOTIFICATION, builder.build());
                         }
                         playIntent(getApplicationContext());
                     }
@@ -429,11 +427,11 @@ public class MediaPlayerService extends Service implements
                     if (currentApiVersion < 24) {
                         notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
                         builder.setContent(notificationView);
-                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                        startForeground(FOREGROUND_NOTIFICATION, builder.build());
                     } else {
                         notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
                         builder.setCustomContentView(notificationView);
-                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                        startForeground(FOREGROUND_NOTIFICATION, builder.build());
                     }
 
                     songPosition++;
@@ -445,20 +443,17 @@ public class MediaPlayerService extends Service implements
                     } else {
                         playSongFromPlaylist(playlistUri);
                     }
-                } else {
-                    // TODO HANDLE ELSE
-                    Toast.makeText(getApplicationContext(), "Please, choose song", Toast.LENGTH_SHORT).show();
                 }
             } else if (action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_SKIP_PREVIOUS")) {
                 if (localArrayList != null) {
                     if (currentApiVersion < 24) {
                         notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
                         builder.setContent(notificationView);
-                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                        startForeground(FOREGROUND_NOTIFICATION, builder.build());
                     } else {
                         notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
                         builder.setCustomContentView(notificationView);
-                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                        startForeground(FOREGROUND_NOTIFICATION, builder.build());
                     }
 
                     songPosition--;
@@ -470,9 +465,6 @@ public class MediaPlayerService extends Service implements
                     } else {
                         playSongFromPlaylist(playlistUri);
                     }
-                } else {
-                    // TODO HANDLE ELSE
-                    Toast.makeText(getApplicationContext(), "Please, choose song", Toast.LENGTH_SHORT).show();
                 }
             } else if (action.equalsIgnoreCase("comvoroninlevan.httpsgithub.simplymusic.ACTION_CANCEL_NOTIFICATION")) {
 
@@ -488,11 +480,11 @@ public class MediaPlayerService extends Service implements
                         if (currentApiVersion < 24) {
                             notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
                             builder.setContent(notificationView);
-                            notificationManager.notify(NOTIFICATION_ID, builder.build());
+                            startForeground(FOREGROUND_NOTIFICATION, builder.build());
                         } else {
                             notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
                             builder.setCustomContentView(notificationView);
-                            notificationManager.notify(NOTIFICATION_ID, builder.build());
+                            startForeground(FOREGROUND_NOTIFICATION, builder.build());
                         }
                     }
                 } else {
@@ -504,11 +496,11 @@ public class MediaPlayerService extends Service implements
                             if (currentApiVersion < 24) {
                                 notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
                                 builder.setContent(notificationView);
-                                notificationManager.notify(NOTIFICATION_ID, builder.build());
+                                startForeground(FOREGROUND_NOTIFICATION, builder.build());
                             } else {
                                 notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.pause);
                                 builder.setCustomContentView(notificationView);
-                                notificationManager.notify(NOTIFICATION_ID, builder.build());
+                                startForeground(FOREGROUND_NOTIFICATION, builder.build());
                             }
                         }
                     }
@@ -519,11 +511,11 @@ public class MediaPlayerService extends Service implements
                     if (currentApiVersion < 24) {
                         notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
                         builder.setContent(notificationView);
-                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                        startForeground(FOREGROUND_NOTIFICATION, builder.build());
                     } else {
                         notificationView.setImageViewResource(R.id.playPauseNotification, R.drawable.play);
                         builder.setCustomContentView(notificationView);
-                        notificationManager.notify(NOTIFICATION_ID, builder.build());
+                        startForeground(FOREGROUND_NOTIFICATION, builder.build());
                     }
                 }
                 pauseIntent(getApplicationContext());
