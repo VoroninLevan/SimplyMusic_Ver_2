@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 
 /**
  * Created by Levan on 11.11.2016.
@@ -47,7 +48,10 @@ public class FragmentAlbums extends Fragment implements LoaderManager.LoaderCall
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long id) {
 
                 Intent intent = new Intent(getActivity(), AlbumSongList.class);
+                TextView name = (TextView)view.findViewById(R.id.albumName);
+                String albumName = name.getText().toString();
                 intent.putExtra("id", id);
+                intent.putExtra("albumName", albumName);
                 startActivity(intent);
             }
         });

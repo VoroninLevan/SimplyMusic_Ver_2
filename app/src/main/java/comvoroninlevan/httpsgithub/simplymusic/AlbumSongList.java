@@ -46,7 +46,10 @@ public class AlbumSongList extends AppCompatActivity implements LoaderManager.Lo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.album_songs);
 
+        String albumName;
         Intent intent = getIntent();
+        albumName = intent.getExtras().getString("albumName", null);
+        setTitle(albumName);
         id = intent.getLongExtra("id", 0);
 
         albumArt = (ImageView)findViewById(R.id.albumArt);
