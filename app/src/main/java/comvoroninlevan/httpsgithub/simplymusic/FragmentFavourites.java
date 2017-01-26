@@ -63,7 +63,7 @@ public class FragmentFavourites extends Fragment implements LoaderManager.Loader
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.list_view, container, false);
+        View rootView = inflater.inflate(R.layout.favourites_list_view, container, false);
 
 
         dbHelper = new FavouritesDbHelper(getActivity());
@@ -72,6 +72,9 @@ public class FragmentFavourites extends Fragment implements LoaderManager.Loader
 
         favouritesCursorAdapter = new FavouritesCursorAdapter(getActivity(), null);
         favouritesSongsList.setAdapter(favouritesCursorAdapter);
+
+        View emptyView = rootView.findViewById(R.id.empty_view);
+        favouritesSongsList.setEmptyView(emptyView);
 
         favouritesSongsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
