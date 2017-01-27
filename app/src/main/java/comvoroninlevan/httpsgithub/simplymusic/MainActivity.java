@@ -62,6 +62,13 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
 
         imagePlayer = (ImageView)findViewById(R.id.imagePlayer);
+        imagePlayer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent toDetailSong = new Intent(MainActivity.this, DetailSong.class);
+                startActivity(toDetailSong);
+            }
+        });
         title = (TextView)findViewById(R.id.title);
         artist = (TextView)findViewById(R.id.artist);
 
